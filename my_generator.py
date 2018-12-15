@@ -46,7 +46,7 @@ def train_generator(path2images, path2masks, batch_size, input_size=512):
                 img = get_image(os.path.join(path2images, id_image), input_size)
                 mask = get_image(os.path.join(path2masks, id_mask), input_size)
                 img, mask = preprocess_input(img, mask)
-
+                img = np.expand_dims(img, axis=2)
                 mask = np.expand_dims(mask, axis=2)
                 x_batch.append(img)
                 y_batch.append(mask)
@@ -55,9 +55,9 @@ def train_generator(path2images, path2masks, batch_size, input_size=512):
             yield x_batch, y_batch
 
 
-path2images = r'C:\Users\ophir\OneDrive\Ophir\University\Master\dimot\TrainData\ct\train'
-path2masks = r'C:\Users\ophir\OneDrive\Ophir\University\Master\dimot\TrainData\seg\train'
-gen = train_generator(path2images, path2masks, batch_size=32)
-for x_batch, y_batch in gen:
-    print(x_batch.shape)
-pass
+# path2images = r'C:\Users\ophir\OneDrive\Ophir\University\Master\dimot\TrainData\ct\train'
+# path2masks = r'C:\Users\ophir\OneDrive\Ophir\University\Master\dimot\TrainData\seg\train'
+# gen = train_generator(path2images, path2masks, batch_size=32)
+# for x_batch, y_batch in gen:
+#     print(x_batch.shape)
+# pass
