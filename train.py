@@ -24,13 +24,13 @@ from my_generator import train_generator
 
 train_path2images = r'C:\Users\ophir\OneDrive\Ophir\University\Master\dimot\TrainData\ct\train'
 train_path2masks = r'C:\Users\ophir\OneDrive\Ophir\University\Master\dimot\TrainData\seg\train'
-train_gen = train_generator(train_path2images, train_path2masks, batch_size=2)
+train_gen = train_generator(train_path2images, train_path2masks, batch_size=1)
 
 val_path2images = r'C:\Users\ophir\OneDrive\Ophir\University\Master\dimot\TrainData\ct\val'
 val_path2masks = r'C:\Users\ophir\OneDrive\Ophir\University\Master\dimot\TrainData\seg\val'
-valid_gen = train_generator(val_path2images, val_path2masks, batch_size=2)
+valid_gen = train_generator(val_path2images, val_path2masks, batch_size=1)
 
-model = Nest_Net(img_rows=512, img_cols=512, color_type=1, num_class=3)
+model = Nest_Net(img_rows=512, img_cols=512, color_type=1, num_class=1)
 model.summary()
 
 # get the loss function
