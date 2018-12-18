@@ -4,7 +4,7 @@ import cv2
 # import keras
 # import keras.preprocessing
 # import nibabel as nib
-
+import matplotlib as plt
 
 def get_image(path2image, input_size):
     img = None
@@ -27,13 +27,21 @@ def preprocess_input(image, mask):
     #                                    scale_limit=(-0.1, 0.1),
     #                                    rotate_limit=(-0, 0))
     # img, mask = randomHorizontalFlip(img, mask)
-    pass
-    return image, mask
+    image = np.expand_dims(image, axis=2)
+    # mask = np.expand_dims(mask, axis=2)
+    new_mask=np.zeros((mask.shape[0],mask.shape[1],2), dtype=np.uint8)
+    inds = np.where(mask==127)
+    new_mask[inds[0], inds[1],0] = 1.
+    inds2 = np.where(mask==255)
+    new_mask[inds2[0], inds2[1],1] = 1.
+
+
+    return image, new_mask
 
 
 def train_generator(path2images, path2masks, batch_size, input_size=512):
-    all_images = [x for x in sorted(os.listdir(path2images))]  # Read all the images
-    all_masks = [x for x in sorted(os.listdir(path2masks))]  # Read all the masks
+    all_images = [x for x in sorted(os.listdir(path2images)) if x[-4:]=='.png'] # Read all the images
+    all_masks = [x for x in sorted(os.listdir(path2masks)) if x[-4:]=='.png']  # Read all the masks
 
     while True:
         for start in range(0, len(all_images), batch_size):
@@ -46,18 +54,17 @@ def train_generator(path2images, path2masks, batch_size, input_size=512):
                 img = get_image(os.path.join(path2images, id_image), input_size)
                 mask = get_image(os.path.join(path2masks, id_mask), input_size)
                 img, mask = preprocess_input(img, mask)
-                img = np.expand_dims(img, axis=2)
-                mask = np.expand_dims(mask, axis=2)
+
                 x_batch.append(img)
                 y_batch.append(mask)
             x_batch = np.array(x_batch, np.float32) / 255
-            y_batch = np.array(y_batch, np.float32) / 255
+            y_batch = np.array(y_batch, np.float32)
             yield x_batch, y_batch
 
-
-# path2images = r'C:\Users\ophir\OneDrive\Ophir\University\Master\dimot\TrainData\ct\train'
-# path2masks = r'C:\Users\ophir\OneDrive\Ophir\University\Master\dimot\TrainData\seg\train'
+#
+# path2images = r'C:\Users\Maya.WG32128\Google Drive\imaging_advanced_course\project\TrainData\ct\train'
+# path2masks = r'C:\Users\Maya.WG32128\Google Drive\imaging_advanced_course\project\TrainData\seg\train'
 # gen = train_generator(path2images, path2masks, batch_size=32)
 # for x_batch, y_batch in gen:
-#     print(x_batch.shape)
+#     print(y_batch.shape)
 # pass

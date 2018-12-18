@@ -21,16 +21,20 @@ from loss import *
 from my_generator import train_generator
 
 
+batch_size=2
 
-train_path2images = r'C:\Users\ophir\OneDrive\Ophir\University\Master\dimot\TrainData\ct\train'
-train_path2masks = r'C:\Users\ophir\OneDrive\Ophir\University\Master\dimot\TrainData\seg\train'
-train_gen = train_generator(train_path2images, train_path2masks, batch_size=1)
+train_path2images = r'C:\Users\Maya.WG32128\Google Drive\imaging_advanced_course\project\TrainData\ct\train'
+train_path2masks = r'C:\Users\Maya.WG32128\Google Drive\imaging_advanced_course\project\TrainData\seg\train'
+train_gen = train_generator(train_path2images, train_path2masks, batch_size=batch_size)
 
-val_path2images = r'C:\Users\ophir\OneDrive\Ophir\University\Master\dimot\TrainData\ct\val'
-val_path2masks = r'C:\Users\ophir\OneDrive\Ophir\University\Master\dimot\TrainData\seg\val'
-valid_gen = train_generator(val_path2images, val_path2masks, batch_size=1)
+val_path2images = r'C:\Users\Maya.WG32128\Google Drive\imaging_advanced_course\project\TrainData\ct\val'
+val_path2masks = r'C:\Users\Maya.WG32128\Google Drive\imaging_advanced_course\project\TrainData\seg\val'
+valid_gen = train_generator(val_path2images, val_path2masks, batch_size=batch_size)
 
-model = Nest_Net(img_rows=512, img_cols=512, color_type=1, num_class=1)
+train_size = len([x for x in sorted(os.listdir(train_path2images)) if x[-4:] == '.png'])  # Read all the images
+val_size = len([x for x in sorted(os.listdir(val_path2images)) if x[-4:] == '.png'])  # Read all the images
+
+model = Nest_Net(img_rows=512, img_cols=512, color_type=1, num_class=2)
 model.summary()
 
 # get the loss function
@@ -46,10 +50,10 @@ lr_scd = LearningRateScheduler(lambda x: 1e-3 * 0.8 ** x)
 early_stopping = EarlyStopping(monitor='val_dice_coef', mode="max", patience=5)
 # Train the model
 hist = model.fit_generator(generator=train_gen,  # Training data supplied by generator
-                           steps_per_epoch=20,  # Number of mini-batches to run in one epoch
+                           steps_per_epoch=train_size/batch_size,  # Number of mini-batches to run in one epoch
                            validation_data=valid_gen,  # Validation data supplied as generator
-                           validation_steps=5,
-                           epochs=10, verbose=2,
+                           validation_steps=val_size/batch_size,
+                           epochs=1000, verbose=2,
                            callbacks=[weight_saver, early_stopping, lr_scd])
 
 plt.plot(hist.history['loss'], color='b')
